@@ -29,6 +29,75 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from imblearn.over_sampling import SMOTEN
 import warnings
 warnings.filterwarnings('ignore')
+def force_dark_mode():
+    st.markdown(
+        """
+        <style>
+        /* Force dark background globally */
+        html, body, [class*="stApp"] {
+            background-color: #0E1117 !important;
+            color: #FAFAFA !important;
+        }
+
+        /* Main content area */
+        section.main > div {
+            background-color: #0E1117 !important;
+        }
+
+        /* Sidebar */
+        section[data-testid="stSidebar"] {
+            background-color: #161B22 !important;
+        }
+
+        /* Headers */
+        h1, h2, h3, h4, h5, h6 {
+            color: #FAFAFA !important;
+        }
+
+        /* Text */
+        p, span, label, div {
+            color: #FAFAFA !important;
+        }
+
+        /* Inputs */
+        input, textarea, select {
+            background-color: #161B22 !important;
+            color: #FAFAFA !important;
+            border: 1px solid #30363D !important;
+        }
+
+        /* Buttons */
+        button {
+            background-color: #21262D !important;
+            color: #FAFAFA !important;
+            border: 1px solid #30363D !important;
+        }
+
+        button:hover {
+            background-color: #30363D !important;
+        }
+
+        /* Tables */
+        thead, tbody, tr, th, td {
+            background-color: #0E1117 !important;
+            color: #FAFAFA !important;
+        }
+
+        /* Mobile Safari / Chrome Fix */
+        @media (prefers-color-scheme: light) {
+            html, body {
+                background-color: #0E1117 !important;
+                color: #FAFAFA !important;
+            }
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+
+# APPLY DARK MODE BEFORE ANY UI RENDERS
+force_dark_mode()
 
 # Page configuration
 st.set_page_config(
