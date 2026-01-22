@@ -546,7 +546,7 @@ def train_ml_models(X, y, progress_callback=None):
         ),
         'Logistic Regression': MultiOutputClassifier(
             LogisticRegression(
-                multi_class='multinomial',  # From Cell 63
+             # From Cell 63
                 solver='lbfgs',
                 max_iter=1000,
                 random_state=42
