@@ -109,6 +109,10 @@ Visit the live app:
 - Upload and get instant predictions
 
 **📞 Connect:** Contact information and social links
+-EmailID: manandhareirika@gmail.com
+-LinkedIn: https://www.linkedin.com/in/eirika-manandhar-683211276?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app
+-github: https://github.com/EirikaMK/
+-portfoli:https://www.eirikamanandhar.com.np/
 
 ### 3. Understanding Predictions
 
@@ -161,7 +165,11 @@ employee-retention-prediction/
 └── utils/                          # Helper functions
 │    ├── helpers.py
 └──images/                          # Helper functions
-    ├── eirika.svg                  #Images and static files
+│   ├── eirika.svg #Images and static files    
+└──runtime.txt 
+
+    
+
 ```
 
 ## 🎯 Key Research Contributions
