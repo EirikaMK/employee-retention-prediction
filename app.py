@@ -2366,10 +2366,7 @@ elif page == '📚 About':
     
     st.write("For questions, collaborations, or access to the full dissertation:")
     
-    st.markdown("""
-    ### 📬 Contact Me
-
-    I’m always open to meaningful conversations, collaborations, and new opportunities.  
+    st.markdown(""" I’m always open to meaningful conversations, collaborations, and new opportunities.  
     Whether you’d like to discuss a project, explore potential partnerships, or simply connect,  
     feel free to reach out using the links below — I’ll be happy to hear from you.
     """)
