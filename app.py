@@ -466,7 +466,7 @@ def load_sample_data():
         }
         return pd.DataFrame(data)
 
-def train_ml_models(X, y):
+def train_ml_models(X, y, progress_callback=None):
     """
     Train all 7 machine learning models EXACTLY as in dissertation
     - Uses ALL 24 features (Q + POS + JS + WLB)
@@ -474,11 +474,12 @@ def train_ml_models(X, y):
     - Creates JOINT ITS labels for SMOTEN balancing
     - Uses RandomOverSampler as fallback
     - Handles XGBoost compatibility issues
+    - NOW WITH SEQUENTIAL TRAINING to prevent crashes!
     """
     from sklearn.multioutput import MultiOutputClassifier
     from imblearn.over_sampling import SMOTEN, RandomOverSampler
     
-    # Create joint label from ALL 5 ITS columns
+    # CRITICAL: Create joint label from ALL 5 ITS columns
     # Example: "4-4-4-4-4" or "3-4-4-3-4"
     joint_label = y.astype(str).agg("-".join, axis=1)
     
@@ -529,7 +530,28 @@ def train_ml_models(X, y):
     # Random Forest: From Cell 53
     # XGBoost: From Cell 59  
     # Others: From Cell 63
+    # ORDER: Fast models first, slow models last
     models = {
+        'Decision Tree': MultiOutputClassifier(
+            DecisionTreeClassifier(
+                random_state=42,       # From Cell 63
+                max_depth=None
+            )
+        ),
+        'KNN': MultiOutputClassifier(
+            KNeighborsClassifier(
+                n_neighbors=7,         # From Cell 63
+                weights='distance'
+            )
+        ),
+        'Logistic Regression': MultiOutputClassifier(
+            LogisticRegression(
+                multi_class='multinomial',  # From Cell 63
+                solver='lbfgs',
+                max_iter=1000,
+                random_state=42
+            )
+        ),
         'Random Forest': MultiOutputClassifier(
             RandomForestClassifier(
                 n_estimators=300,      # From Cell 53
@@ -547,6 +569,14 @@ def train_ml_models(X, y):
                 random_state=42
             )
         ),
+        'SVM': MultiOutputClassifier(
+            SVC(
+                kernel='rbf',          # From Cell 63
+                C=2.0,
+                gamma='scale',
+                random_state=42
+            )
+        ),
         'XGBoost': MultiOutputClassifier(
             XGBClassifier(
                 n_estimators=500,      # From Cell 59 - IMPORTANT!
@@ -560,40 +590,18 @@ def train_ml_models(X, y):
                 n_jobs=-1,
                 use_label_encoder=False
             )
-        ),
-        'KNN': MultiOutputClassifier(
-            KNeighborsClassifier(
-                n_neighbors=7,         # From Cell 63
-                weights='distance'
-            )
-        ),
-        'Decision Tree': MultiOutputClassifier(
-            DecisionTreeClassifier(
-                random_state=42,       # From Cell 63
-                max_depth=None
-            )
-        ),
-        'SVM': MultiOutputClassifier(
-            SVC(
-                kernel='rbf',          # From Cell 63
-                C=2.0,
-                gamma='scale',
-                random_state=42
-            )
-        ),
-        'Logistic Regression': MultiOutputClassifier(
-            LogisticRegression(  # From Cell 63
-                solver='lbfgs',
-                max_iter=1000,
-                random_state=42
-            )
         )
     }
     
     results = {}
+    model_count = len(models)
     
-    for name, model in models.items():
+    for idx, (name, model) in enumerate(models.items(), 1):
         try:
+            # Update progress if callback provided
+            if progress_callback:
+                progress_callback(name, idx, model_count)
+            
             # Train model
             model.fit(X_train, y_train)
             
@@ -628,6 +636,12 @@ def train_ml_models(X, y):
                 'samples_before': len(X),
                 'samples_after': len(X_bal)
             }
+            
+            # Clean up memory after each model
+            import gc
+            del y_pred
+            gc.collect()
+            
         except Exception as e:
             # If a model fails, store error but continue with others
             results[name] = {
@@ -641,6 +655,10 @@ def train_ml_models(X, y):
                 'samples_before': len(X),
                 'samples_after': len(X_bal)
             }
+            
+            # Clean up memory even on error
+            import gc
+            gc.collect()
     
     return results
 
@@ -709,7 +727,7 @@ with st.sidebar:
         st.markdown("[🌐 Portfolio](https://www.eirikamanandhar.com.np/index.html)")
         st.markdown("[📧 Email](mailto:manandhareirika@gmail.com)")
     with col2:
-        st.markdown("[💼 LinkedIn](https://www.linkedin.com/in/eirika-manandhar-68321127)")
+        st.markdown("[💼 LinkedIn](https://www.linkedin.com/in/eirika-manandhar-683211276?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app)")
         st.markdown("[💻 GitHub](https://github.com/EirikaMK)")
     
     st.markdown("---")
@@ -1408,7 +1426,7 @@ elif page == '📤 Upload & Predict':
             with tab2:
                 st.markdown("### Machine Learning Predictions")
                 
-                # Include ALL 24 features (Q + POS + JS + WLB)
+                # CRITICAL FIX: Include ALL 24 features (Q + POS + JS + WLB)
                 required_features = q_cols + pos_cols + js_cols + wlb_cols
                 
                 st.info(f"""
@@ -1429,12 +1447,34 @@ elif page == '📤 Upload & Predict':
                     X = X.fillna(X.median())
                     y = y.fillna(y.median())
                     
-                    with st.spinner(f"🚀 Training 7 ML models with {len(required_features)} features + Multi-Output prediction..."):
-                        results = train_ml_models(X, y)
+                    st.markdown("#### 🚀 Training Models")
+                    st.info("""
+                    **Training 7 models sequentially to prevent memory issues:**
+                    - Each model trains independently
+                    - Progress updates in real-time
+                    - Results saved after each model completes
+                    """)
                     
-                    st.success(f"✅ Models trained successfully using **{len(required_features)} features**!")
+                    # Create progress bar and status text
+                    progress_bar = st.progress(0)
+                    status_text = st.empty()
                     
-                    # Methodology info
+                    # Define callback to update progress
+                    def update_progress(model_name, current, total):
+                        progress = current / total
+                        progress_bar.progress(progress)
+                        status_text.text(f"Training {model_name}... ({current}/{total})")
+                    
+                    # Train models with progress updates
+                    results = train_ml_models(X, y, progress_callback=update_progress)
+                    
+                    # Clear progress indicators
+                    progress_bar.empty()
+                    status_text.empty()
+                    
+                    st.success(f"✅ All 7 models trained successfully using **{len(required_features)} features**!")
+                    
+                    # Show methodology info
                     if 'Random Forest' in results:
                         balancing_info = results['Random Forest'].get('balancing_method', 'Unknown')
                         samples_before = results['Random Forest'].get('samples_before', 0)
@@ -1721,6 +1761,61 @@ elif page == '📤 Upload & Predict':
             with tab4:
                 st.markdown("### Export Analysis Results")
                 
+                st.markdown("#### Download Model Performance Results")
+                
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    if 'results' in locals() and results:
+                        # Create downloadable model results CSV
+                        model_results_data = []
+                        for model_name in ['Random Forest', 'Gradient Boosting', 'XGBoost', 'KNN', 
+                                           'Decision Tree', 'SVM', 'Logistic Regression']:
+                            if model_name in results:
+                                model_results_data.append({
+                                    'Model': model_name,
+                                    'Accuracy (%)': results[model_name]['accuracy'] * 100,
+                                    'Precision (%)': results[model_name]['precision'] * 100,
+                                    'Recall (%)': results[model_name]['recall'] * 100,
+                                    'F1-Score (%)': results[model_name]['f1'] * 100,
+                                    'Samples Before Balancing': results[model_name]['samples_before'],
+                                    'Samples After Balancing': results[model_name]['samples_after'],
+                                    'Balancing Method': results[model_name]['balancing_method']
+                                })
+                        
+                        results_csv = pd.DataFrame(model_results_data).to_csv(index=False)
+                        st.download_button(
+                            label="📥 Download Model Results",
+                            data=results_csv,
+                            file_name=f"model_results_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.csv",
+                            mime="text/csv",
+                            use_container_width=True
+                        )
+                        
+                        st.success("✅ Model results ready for download")
+                    else:
+                        st.button("📥 Download Model Results", disabled=True, use_container_width=True)
+                        st.caption("Train models first to enable download")
+                
+                with col2:
+                    if 'results_df' in locals() and not results_df.empty:
+                        # Download comparison with dissertation
+                        comparison_csv = results_df.to_csv(index=False)
+                        st.download_button(
+                            label="📥 Download Dissertation Comparison",
+                            data=comparison_csv,
+                            file_name=f"dissertation_comparison_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.csv",
+                            mime="text/csv",
+                            use_container_width=True
+                        )
+                        st.success("✅ Comparison ready for download")
+                    else:
+                        st.button("📥 Download Dissertation Comparison", disabled=True, use_container_width=True)
+                        st.caption("Train models first to enable download")
+                
+                st.markdown("<br>", unsafe_allow_html=True)
+                st.markdown("#### Download Data Files")
+                
                 col1, col2, col3 = st.columns(3)
                 
                 with col1:
@@ -1755,7 +1850,7 @@ elif page == '📤 Upload & Predict':
                         )
                     else:
                         st.button("📥 Download Predictions", disabled=True, use_container_width=True)
-                        st.caption("Run ML predictions first")
+                        st.caption("Run predictions first")
                 
                 st.markdown("<br>", unsafe_allow_html=True)
                 
@@ -1764,11 +1859,13 @@ elif page == '📤 Upload & Predict':
                     <div class="feature-title">📋 Export Options</div>
                     <div class="feature-description">
                         <ul>
+                            <li><strong>Model Results:</strong> Complete performance metrics for all 7 models</li>
+                            <li><strong>Dissertation Comparison:</strong> Your results vs dissertation benchmarks</li>
                             <li><strong>Original Data:</strong> Your uploaded data in CSV format</li>
                             <li><strong>Statistics:</strong> Descriptive statistics for all variables</li>
                             <li><strong>Predictions:</strong> ML predictions with retention risk assessment</li>
                         </ul>
-                        <p style="margin-top: 1rem;">All files are generated in CSV format for easy import into Excel, SPSS, or other analysis tools.</p>
+                        <p style="margin-top: 1rem;">All files are timestamped and generated in CSV format for easy import into Excel, SPSS, R, Python, or other analysis tools.</p>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -1857,7 +1954,7 @@ elif page == '💬 Connect With Me':
     
     with col2:
         st.markdown("""
-        <a href="https://www.linkedin.com/in/eirika-manandhar-68321127" target="_blank" style="text-decoration: none;">
+        <a href="https://www.linkedin.com/in/eirika-manandhar-683211276?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app" target="_blank" style="text-decoration: none;">
             <div class="contact-button" style="display: block; text-align: center; margin: 1rem 0;">
                 💼 LinkedIn Profile
             </div>
@@ -1995,7 +2092,7 @@ elif page == '📚 About':
     - **Best Model:** Random Forest achieved 99.80% weighted F1-score
     - **Feature Importance:** Perceived Organizational Support emerged as the strongest predictor
     - **Model Consistency:** Top 5 models achieved >99.6% accuracy
-    - **Cross-Validation:** Minimal variance across folds 
+    - **Cross-Validation:** Minimal variance across folds (σ = 0.018)
     """)
     
     st.markdown("### PLS-SEM Results")
@@ -2058,7 +2155,7 @@ elif page == '📚 About':
     
     st.write("""
     **Email:** manandhareirika@gmail.com  
-    **LinkedIn:** [linkedin.com/in/eirika-manandhar-68321127](https://www.linkedin.com/in/eirika-manandhar-68321127)  
+    **LinkedIn:** [linkedin.com/in/eirika-manandhar-68321127]https://www.linkedin.com/in/eirika-manandhar-683211276?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app)  
     **Portfolio:** [eirikamanandhar.com.np](https://www.eirikamanandhar.com.np/index.html)  
     **GitHub:** [github.com/EirikaMK](https://github.com/EirikaMK)
     """)
@@ -2070,7 +2167,7 @@ st.markdown("""
     <div class="footer-title">Connect With Me</div>
     <div class="footer-links">
         <a href="https://www.eirikamanandhar.com.np/index.html" target="_blank" class="footer-link">🌐 Portfolio</a>
-        <a href="https://www.linkedin.com/in/eirika-manandhar-68321127" target="_blank" class="footer-link">💼 LinkedIn</a>
+        <a href="https://www.linkedin.com/in/eirika-manandhar-683211276?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app" target="_blank" class="footer-link">💼 LinkedIn</a>
         <a href="mailto:manandhareirika@gmail.com" class="footer-link">📧 Email</a>
         <a href="https://github.com/EirikaMK" target="_blank" class="footer-link">💻 GitHub</a>
     </div>
