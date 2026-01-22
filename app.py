@@ -2366,11 +2366,12 @@ elif page == '📚 About':
     
     st.write("For questions, collaborations, or access to the full dissertation:")
     
-    st.write("""
-    **Email:** manandhareirika@gmail.com  
-    **LinkedIn:** [linkedin.com/in/eirika-manandhar-68321127]https://www.linkedin.com/in/eirika-manandhar-683211276?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app)  
-    **Portfolio:** [eirikamanandhar.com.np](https://www.eirikamanandhar.com.np/index.html)  
-    **GitHub:** [github.com/EirikaMK](https://github.com/EirikaMK)
+    st.markdown("""
+    ### 📬 Contact Me
+
+    I’m always open to meaningful conversations, collaborations, and new opportunities.  
+    Whether you’d like to discuss a project, explore potential partnerships, or simply connect,  
+    feel free to reach out using the links below — I’ll be happy to hear from you.
     """)
 
 # Footer
