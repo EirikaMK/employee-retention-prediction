@@ -45,6 +45,129 @@ sys.path.insert(0, str(project_root))
 # Custom CSS
 st.markdown("""
 <style>
+    /* ==========================================
+       UNIVERSAL DARK THEME - ALL BROWSERS
+       ========================================== */
+    
+    /* Force dark background on entire app */
+    .stApp {
+        background-color: #0e1117 !important;
+        color: #fafafa !important;
+    }
+    
+    /* Main content area */
+    .main {
+        background-color: #0e1117 !important;
+    }
+    
+    /* Block container */
+    .block-container {
+        background-color: #0e1117 !important;
+    }
+    
+    /* Ensure all text is visible on dark background */
+    .stApp * {
+        color: #fafafa !important;
+    }
+    
+    /* Headers */
+    h1, h2, h3, h4, h5, h6 {
+        color: #fafafa !important;
+    }
+    
+    /* Dataframes and tables */
+    .dataframe {
+        background-color: #262730 !important;
+        color: #fafafa !important;
+    }
+    
+    .dataframe th {
+        background-color: #667eea !important;
+        color: white !important;
+    }
+    
+    .dataframe td {
+        background-color: #1e1e1e !important;
+        color: #fafafa !important;
+    }
+    
+    /* Input fields */
+    input, textarea, select {
+        background-color: #262730 !important;
+        color: #fafafa !important;
+        border: 1px solid #667eea !important;
+    }
+    
+    .stTextInput input, .stTextArea textarea, .stSelectbox select {
+        background-color: #262730 !important;
+        color: #fafafa !important;
+    }
+    
+    /* File uploader */
+    .stFileUploader {
+        background-color: #262730 !important;
+    }
+    
+    /* Tabs */
+    .stTabs [data-baseweb="tab-list"] {
+        background-color: #262730 !important;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        background-color: #262730 !important;
+        color: #fafafa !important;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background-color: #667eea !important;
+        color: white !important;
+    }
+    
+    /* Expander */
+    .streamlit-expanderHeader {
+        background-color: #262730 !important;
+        color: #fafafa !important;
+    }
+    
+    .streamlit-expanderContent {
+        background-color: #1e1e1e !important;
+    }
+    
+    /* Metric cards */
+    [data-testid="stMetric"] {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        padding: 20px !important;
+        border-radius: 15px !important;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
+    }
+    
+    [data-testid="stMetricValue"] {
+        color: white !important;
+        font-size: 2.5em !important;
+        font-weight: bold !important;
+    }
+    
+    [data-testid="stMetricLabel"] {
+        color: white !important;
+        opacity: 0.95 !important;
+    }
+    
+    /* Alert boxes */
+    .stAlert {
+        background-color: #262730 !important;
+        color: #fafafa !important;
+    }
+    
+    /* Code blocks */
+    code, pre {
+        background-color: #262730 !important;
+        color: #fafafa !important;
+    }
+    
+    /* ==========================================
+       CUSTOM STYLING (keep existing)
+       ========================================== */
+    
     /* Main styling */
     .main {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -109,10 +232,14 @@ st.markdown("""
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 60px 20px;
         border-radius: 20px;
-        color: white;
+        color: white !important;
         text-align: center;
         margin-bottom: 30px;
         box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    
+    .hero-section * {
+        color: white !important;
     }
     
     .hero-title {
@@ -121,6 +248,7 @@ st.markdown("""
         margin-bottom: 20px;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         animation: fadeInDown 1s;
+        color: white !important;
     }
     
     .hero-subtitle {
@@ -128,6 +256,7 @@ st.markdown("""
         font-weight: 300;
         margin-bottom: 30px;
         opacity: 0.95;
+        color: white !important;
     }
     
     .hero-description {
@@ -135,14 +264,15 @@ st.markdown("""
         max-width: 800px;
         margin: 0 auto;
         line-height: 1.6;
+        color: white !important;
     }
     
     /* Stats cards */
     .stat-card {
-        background: white;
+        background: #262730 !important;
         padding: 25px;
         border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         text-align: center;
         transition: transform 0.3s, box-shadow 0.3s;
         height: 100%;
@@ -150,29 +280,29 @@ st.markdown("""
     
     .stat-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
     }
     
     .stat-value {
         font-size: 2.5em;
         font-weight: bold;
-        color: #667eea;
+        color: #667eea !important;
         margin: 10px 0;
     }
     
     .stat-label {
         font-size: 1.1em;
-        color: #666;
+        color: #fafafa !important;
         font-weight: 500;
     }
     
     /* Feature boxes */
     .feature-box {
-        background: white;
+        background: #262730 !important;
         padding: 30px;
         border-radius: 15px;
         margin: 15px 0;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         border-left: 5px solid #667eea;
         transition: all 0.3s;
         height: 100%;
@@ -182,20 +312,24 @@ st.markdown("""
     
     .feature-box:hover {
         transform: translateX(10px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
     }
     
     .feature-title {
         font-size: 1.5em;
         font-weight: 600;
-        color: #667eea;
+        color: #667eea !important;
         margin-bottom: 10px;
     }
     
     .feature-description {
-        color: #666;
+        color: #fafafa !important;
         line-height: 1.6;
         flex-grow: 1;
+    }
+    
+    .feature-description * {
+        color: #fafafa !important;
     }
     
     /* Contact Card */
@@ -203,17 +337,21 @@ st.markdown("""
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 3rem 2rem;
         border-radius: 20px;
-        color: white;
+        color: white !important;
         box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
         text-align: center;
         margin-bottom: 2rem;
+    }
+    
+    .contact-card * {
+        color: white !important;
     }
     
     .contact-name {
         font-size: 2.5rem;
         font-weight: 700;
         margin-bottom: 0.5rem;
-        color: white;
+        color: white !important;
     }
     
     .contact-title {
@@ -221,7 +359,7 @@ st.markdown("""
         font-weight: 400;
         opacity: 0.9;
         margin-bottom: 0.3rem;
-        color: white;
+        color: white !important;
     }
     
     .contact-bio {
@@ -230,13 +368,13 @@ st.markdown("""
         opacity: 0.95;
         max-width: 700px;
         margin: 2rem auto;
-        color: white;
+        color: white !important;
     }
     
     .contact-button {
         display: inline-block;
-        background: white;
-        color: #667eea;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
         padding: 1rem 2rem;
         border-radius: 50px;
         text-decoration: none;
@@ -244,35 +382,41 @@ st.markdown("""
         font-size: 1rem;
         margin: 0.5rem;
         transition: all 0.3s ease;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
     }
     
     .contact-button:hover {
         transform: translateY(-3px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        background: #f7fafc;
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.5);
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%) !important;
     }
     
     /* Footer */
     .footer {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        color: white !important;
         padding: 30px 20px;
         text-align: center;
         border-radius: 15px;
         margin-top: 50px;
-        box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+    }
+    
+    .footer * {
+        color: white !important;
     }
     
     .footer-title {
         font-size: 1.5em;
         font-weight: 600;
         margin-bottom: 10px;
+        color: white !important;
     }
     
     .footer-text {
         font-size: 1em;
         opacity: 0.9;
+        color: white !important;
     }
     
     .footer-links {
@@ -280,7 +424,7 @@ st.markdown("""
     }
     
     .footer-link {
-        color: white;
+        color: white !important;
         text-decoration: none;
         margin: 0 1rem;
         font-weight: 500;
@@ -288,7 +432,7 @@ st.markdown("""
     }
     
     .footer-link:hover {
-        color: #f7fafc;
+        color: #f7fafc !important;
         transform: scale(1.05);
     }
     
