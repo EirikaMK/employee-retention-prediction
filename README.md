@@ -93,7 +93,8 @@ The application will open in your browser at `http://localhost:8501`
 ## 🎮 Usage
 
 ### 1. Access the Application
-Visit the live app: 
+Visit the live app: at `https://employee-retention-prediction-tqburrqiw9uzp7tey2e8tw.streamlit.app/'
+
 
 ### 2. Navigate Through Pages
 
@@ -108,11 +109,14 @@ Visit the live app:
 - Ensure your file has columns: Q1-Q8, POS1-POS8, JS1-JS5, WLB1-WLB3, ITS1-ITS5
 - Upload and get instant predictions
 
-**📞 Connect:** Contact information and social links
+**📞 Connect With Me:** Contact information and social links
 -EmailID: manandhareirika@gmail.com
 -LinkedIn: https://www.linkedin.com/in/eirika-manandhar-683211276?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app
 -github: https://github.com/EirikaMK/
 -portfoli:https://www.eirikamanandhar.com.np/
+
+**About** 
+-This dissertation project presents a comprehensive framework combining Machine Learning and Partial Least Squares Structural Equation Modeling (PLS-SEM) to predict and understand employee retention in the Vietnam electronics manufacturing sector.
 
 ### 3. Understanding Predictions
 
