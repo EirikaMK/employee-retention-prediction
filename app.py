@@ -692,7 +692,7 @@ def train_ml_models(X, y, progress_callback=None):
     from sklearn.multioutput import MultiOutputClassifier
     from imblearn.over_sampling import SMOTEN, RandomOverSampler
     
-    # CRITICAL: Create joint label from ALL 5 ITS columns
+    # Create joint label from ALL 5 ITS columns
     # Example: "4-4-4-4-4" or "3-4-4-3-4"
     joint_label = y.astype(str).agg("-".join, axis=1)
     
@@ -1451,7 +1451,7 @@ elif page == '🤖 Model Analysis':
         st.markdown("<br>", unsafe_allow_html=True)
         
         feature_groups = ['Work-Life Balance (WLB)', 'Perceived Organizational Support (POS)', 'Job Satisfaction (JS)']
-        importance_scores = [0.463, 0.600, -0.072]
+        importance_scores = [0.019, 0.024, 0.022]
         
         col1, col2 = st.columns([2, 1])
         
@@ -1486,7 +1486,7 @@ elif page == '🤖 Model Analysis':
                 <div class="feature-title">🥇 Top Predictor</div>
                 <div class="feature-description">
                     <strong>Perceived Organizational Support (POS)</strong><br>
-                    SHAP Value: 0.489<br><br>
+                    SHAP Value: 0.024<br><br>
                     The strongest predictor of employee retention, indicating that perceived organizational support 
                     initiatives have the highest impact on retention decisions.
                 </div>
@@ -1639,7 +1639,7 @@ elif page == '📤 Upload & Predict':
             with tab2:
                 st.markdown("### Machine Learning Predictions")
                 
-                # CRITICAL FIX: Include ALL 24 features (Q + POS + JS + WLB)
+                #: Include ALL 24 features (Q + POS + JS + WLB)
                 required_features = q_cols + pos_cols + js_cols + wlb_cols
                 
                 st.info(f"""
